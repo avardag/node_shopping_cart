@@ -5,10 +5,13 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var expressHbs = require('express-handlebars');
 var logger = require('morgan');
-
+var mongoose = require("mongoose");
 var indexRouter = require('./routes/index');
 
 var app = express();
+//Mongoose setup
+mongoose.connect("mongodb://localhost:27017/shopping_node", {useNewUrlParser: true});
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
