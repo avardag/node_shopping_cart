@@ -1,6 +1,7 @@
 let express = require("express");
 let router = express.Router();
 let csrf = require("csurf");
+let passport = require('passport')
 
 let csrfProtection = csrf();
 //use csrfProtection MW for all roues
@@ -36,10 +37,15 @@ router.get("/user/signup", function(req, res) {
   res.render("user/signup", { csrfToken: req.csrfToken() });
 });
 
-router.post("/user/signup", function(req, res) {
-  // pass the csrfToken to the view
-  res.redirect("/");
-});
+//POST signup rote with passport authentication
+router.post("/user/signup", passport.authenticate("local.signup", {
+  successRedirect: '/user/profile',
+  failureRedirect: '/user/signup',
+  failureFlash: true
+}));
 
+router.get("/user/profile", function(req, res) {
+  res.render("user/profile");
+});
 
 module.exports = router;

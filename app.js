@@ -15,7 +15,8 @@ var indexRouter = require('./routes/index');
 var app = express();
 //Mongoose setup
 mongoose.connect("mongodb://localhost:27017/shopping_node", {useNewUrlParser: true});
-
+//load passport local strategy
+require("./config/passport_strategy")
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -34,6 +35,7 @@ app.use(session({
 }))
 //flash messages MW (has to come after sessions)
 app.use(flash());
+//passport middleware (has to come after sessions)
 app.use(passport.initialize());
 app.use(passport.session())
 //Static files
