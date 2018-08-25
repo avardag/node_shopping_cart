@@ -6,7 +6,9 @@ var bodyParser = require('body-parser');
 var expressHbs = require('express-handlebars');
 var logger = require('morgan');
 var mongoose = require("mongoose");
-let session = require('express-session')
+let session = require('express-session');
+let passport = require("passport");
+let flash = require("connect-flash");
 
 var indexRouter = require('./routes/index');
 
@@ -24,13 +26,20 @@ app.use(logger('dev'));
 app.use(bodyParser.urlencoded({ extended: false}));
 app.use(bodyParser.json());
 app.use(cookieParser());
+//sesssion MWare
 app.use(session({
   secret: 'supersecretword',
   resave: false,
   saveUninitialized: true
 }))
+//flash messages MW (has to come after sessions)
+app.use(flash());
+app.use(passport.initialize());
+app.use(passport.session())
+//Static files
 app.use(express.static(path.join(__dirname, 'public')));
 
+//ROUTES
 app.use('/', indexRouter);
 
 // catch 404 and forward to error handler

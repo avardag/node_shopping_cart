@@ -7,7 +7,9 @@
     "dev": "nodemon ./bin/www"
   },
   "dependencies": {
+    "bcrypt": "^3.0.0",
     "body-parser": "^1.18.3",
+    "connect-flash": "^0.1.1",
     "cookie-parser": "~1.4.3",
     "csurf": "^1.9.0",
     "debug": "~2.6.9",
@@ -17,7 +19,8 @@
     "hbs": "~4.0.1",
     "http-errors": "~1.6.2",
     "mongoose": "^5.2.9",
-    "morgan": "~1.9.0"
+    "morgan": "~1.9.0",
+    "passport": "^0.4.0"
   },
   "devDependencies": {
     "nodemon": "^1.18.3"
