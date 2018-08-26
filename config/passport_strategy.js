@@ -15,6 +15,8 @@ passport.deserializeUser((id, done) => {
 });
 
 //create new user strategy
+
+//SIGNUP strategy
 passport.use(
   "local.signup",
   new LocalStrategy(
@@ -60,3 +62,39 @@ passport.use(
     }
   )
 );
+//SIGNIN strategy
+passport.use("local.signin", new LocalStrategy(
+    {
+      usernameField: "email",
+      passwordField: "password",
+      passReqToCallback: true
+    }, (req, email, password, done)=>{
+      //first validate body by expressValidator
+      req.checkBody("email", "Invalid email").notEmpty().isEmail();
+      req.checkBody("password", "Invalid password").notEmpty();
+      let errors = req.validationErrors();
+      if (errors) {
+        let messages = errors.map((error)=>{
+          return error.msg;
+        });
+        //done(error=null, isSuccessful=false, otherArg)
+        return done(null, false, req.flash("error", messages))
+      }
+
+      User.findOne({ email: email }, (err, foundUser) => {
+        if (err) {
+          return done(err);
+        }
+        //if no user with passed email is found
+        if (!foundUser) {
+          return done(null, false, { message: "No user found" });
+        }
+        //if password doesnt match
+        if (!foundUser.validPassword(password)) { //validPassword -> custom MW from mongoose
+          return done(null, false, { message: "Wrong password" });
+        }
+        return done(null, foundUser)
+      });
+    }
+  )
+)

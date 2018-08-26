@@ -55,5 +55,25 @@ router.post(
 router.get("/user/profile", function(req, res) {
   res.render("user/profile");
 });
+//SIGNIN GET route
+router.get("/user/signin", function(req, res) {
+  // pass flash messages
+  let messages = req.flash("error");
+  // pass the csrfToken to the view
+  res.render("user/signin", {
+    csrfToken: req.csrfToken(),
+    messages: messages,
+    hasErrors: messages.length > 0
+  });
+});
 
+// SIGNIN POST route with passport authentication
+router.post(
+  "/user/signin",
+  passport.authenticate("local.signin", {
+    successRedirect: "/user/profile",
+    failureRedirect: "/user/signin",
+    failureFlash: true
+  })
+);
 module.exports = router;
