@@ -2,6 +2,7 @@ let express = require("express");
 let router = express.Router();
 
 let Product = require("../models/product");
+let Cart = require("../models/cart");
 
 //ROUTES
 /* GET home page. */
@@ -24,5 +25,23 @@ router.get("/", function(req, res, next) {
     });
   });
 });
+
+router.get("/add-to-cart/:id", (req, res, next)=>{
+  let productId = req.params.id;
+  //create new Cart instance,  if it exists pass old cart from session
+  let cart = new Cart(req.session.cart ? req.session.cart : {});
+
+  Product.findById(productId, (err, foundProduct)=>{
+    if (err) {
+      console.log('err', err);
+      return res.redirect("/");
+    }
+    //add found product to cart instance and session store
+    cart.add(foundProduct, foundProduct.id);
+    req.session.cart = cart;
+    console.log('req.session.cart', req.session.cart);
+    res.redirect("/")
+  })
+})
 
 module.exports = router;
