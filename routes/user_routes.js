@@ -31,9 +31,6 @@ router.post(
   })
 );
 
-router.get("/profile", function(req, res) {
-  res.render("user/profile");
-});
 //SIGNIN GET route
 router.get("/signin", function(req, res) {
   // pass flash messages
@@ -56,4 +53,16 @@ router.post(
   })
 );
 
+//PROFILE route
+router.get("/profile", isLoggedIn, function(req, res) {
+  res.render("user/profile");
+});
+
 module.exports = router;
+
+function isLoggedIn(req, res, next) {
+  if (req.isAuthenticated()) { //isAuthenticated -> method from passport
+    return next();
+  }
+  res.redirect("/");
+}
