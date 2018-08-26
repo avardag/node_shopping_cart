@@ -10,6 +10,8 @@ let session = require('express-session');
 let passport = require("passport");
 let flash = require("connect-flash");
 let validator = require('express-validator');
+//import connect-mongo, pass express-session as an arg
+let MongoStore = require("connect-mongo")(session); 
 
 var indexRouter = require('./routes/index');
 var userRouter = require('./routes/user_routes');
@@ -35,7 +37,9 @@ app.use(cookieParser());
 app.use(session({
   secret: 'supersecretword',
   resave: false,
-  saveUninitialized: true
+  saveUninitialized: true,
+  store: new MongoStore({ mongooseConnection: mongoose.connection }),//use existing connection,
+  cookie: {maxAge: 180*60*1000} //expires after 3 hours
 }))
 //flash messages MW (has to come after sessions)
 app.use(flash());
@@ -45,10 +49,12 @@ app.use(passport.session())
 //Static files
 app.use(express.static(path.join(__dirname, 'public')));
 
-//ROUTES custom middleware
+// custom middleware defining global vars to use in the views
 app.use((req, res, next)=>{
   //create custom global var userIsLoggedIn for all routes & views 2b used
   res.locals.userIsLoggedIn = req.isAuthenticated();
+  //custom session global variable
+  res.locals.userSession = req.session;
   next();
 })
 //ROUTES (order matters)
