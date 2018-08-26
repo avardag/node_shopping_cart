@@ -9,6 +9,7 @@ var mongoose = require("mongoose");
 let session = require('express-session');
 let passport = require("passport");
 let flash = require("connect-flash");
+let validator = require('express-validator');
 
 var indexRouter = require('./routes/index');
 
@@ -26,6 +27,8 @@ app.set('view engine', '.hbs');
 app.use(logger('dev'));
 app.use(bodyParser.urlencoded({ extended: false}));
 app.use(bodyParser.json());
+//validator should come after bodyParser
+app.use(validator());
 app.use(cookieParser());
 //sesssion MWare
 app.use(session({

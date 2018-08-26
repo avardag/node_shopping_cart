@@ -24,12 +24,25 @@ passport.use(
       passReqToCallback: true
     },
     (req, email, password, done) => {
+      //first validate body by expressValidator
+      req.checkBody("email", "Invalid email").notEmpty().isEmail();
+      req.checkBody("password", "Invalid password").notEmpty().isLength({min: 6});
+      let errors = req.validationErrors();
+      if (errors) {
+        let messages = errors.map((error)=>{
+          return error.msg;
+        });
+        //done(error=null, isSuccessful=false, otherArg)
+        return done(null, false, req.flash("error", messages))
+      }
+
       User.findOne({ email: email }, (err, user) => {
         if (err) {
           return done(err);
         }
         if (user) {
           //if user already exists
+          //done(error=null, isSuccessful=false, otherArg)
           return done(null, false, { message: "Email already in use" });
         }
         let newUser = new User();
@@ -41,7 +54,7 @@ passport.use(
           if (err) {
             return done(err);
           }
-          return done(null, result);
+          return done(null, result);//done(error=null, argOnSuccess=result)
         });
       });
     }
