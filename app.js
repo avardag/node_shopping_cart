@@ -12,6 +12,7 @@ let flash = require("connect-flash");
 let validator = require('express-validator');
 
 var indexRouter = require('./routes/index');
+var userRouter = require('./routes/user_routes');
 
 var app = express();
 //Mongoose setup
@@ -44,7 +45,8 @@ app.use(passport.session())
 //Static files
 app.use(express.static(path.join(__dirname, 'public')));
 
-//ROUTES
+//ROUTES (order matters)
+app.use('/user', userRouter);
 app.use('/', indexRouter);
 
 // catch 404 and forward to error handler
