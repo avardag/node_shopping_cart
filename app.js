@@ -45,6 +45,12 @@ app.use(passport.session())
 //Static files
 app.use(express.static(path.join(__dirname, 'public')));
 
+//ROUTES custom middleware
+app.use((req, res, next)=>{
+  //create custom global var userIsLoggedIn for all routes & views 2b used
+  res.locals.userIsLoggedIn = req.isAuthenticated();
+  next();
+})
 //ROUTES (order matters)
 app.use('/user', userRouter);
 app.use('/', indexRouter);
