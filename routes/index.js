@@ -53,4 +53,14 @@ router.get("/shopping-cart", (req, res, next)=>{
   
 })
 
+//checkout route
+router.get("/checkout", (req, res, next)=>{
+  if (!req.session.cart) {
+    return res.redirect("shop/shopping-cart")
+  }
+  let cart = new Cart(req.session.cart);
+  res.render("shop/checkout", { total: cart.totalPrice})
+  
+}) 
+
 module.exports = router;
