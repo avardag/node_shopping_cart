@@ -38,10 +38,19 @@ router.get("/add-to-cart/:id", (req, res, next)=>{
     }
     //add found product to cart instance and session store
     cart.add(foundProduct, foundProduct.id);
+    //set session cart variable 2b cart with added products
     req.session.cart = cart;
-    console.log('req.session.cart', req.session.cart);
     res.redirect("/")
   })
+})
+//Shopping cart route
+router.get("/shopping-cart", (req, res, next)=>{
+  if (!req.session.cart) {
+    return res.render("shop/shopping-cart", {products: null})
+  }
+  let cart = new Cart(req.session.cart);
+  res.render("shop/shopping-cart", {products: cart.generateArray(), totalPrice: cart.totalPrice})
+  
 })
 
 module.exports = router;
