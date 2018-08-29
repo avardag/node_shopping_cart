@@ -7,6 +7,9 @@ let Cart = require("../models/cart");
 //ROUTES
 /* GET home page. */
 router.get("/", function(req, res, next) {
+  //show success message if successfull purchase
+  let successMsg = req.flash("success")[0];
+
   //fetch products from DB
   Product.find({}, (err, docs) => {
     if (err) {
@@ -21,7 +24,9 @@ router.get("/", function(req, res, next) {
     }
     res.render("shop/index", {
       title: "Shopping Cart",
-      products: productChunks
+      products: productChunks,
+      successMsg: successMsg,
+      noMsg: !successMsg
     });
   });
 });
@@ -59,8 +64,38 @@ router.get("/checkout", (req, res, next)=>{
     return res.redirect("/shopping-cart")
   }
   let cart = new Cart(req.session.cart);
-  res.render("shop/checkout", { total: cart.totalPrice})
-  
+  //display error message if there is stored err in flash errors arr
+  let errMsg = req.flash("error")[0]; 
+  res.render("shop/checkout", { total: cart.totalPrice, errMsg: errMsg, noError: !errMsg})
+}) 
+//checkout post - charge
+router.post("/checkout", (req, res, next)=>{
+  if (!req.session.cart) {
+    return res.redirect("/shopping-cart")
+  }
+  let cart = new Cart(req.session.cart);
+
+  let stripe = require("stripe")("sk_test_8sd2Y7L3FiTLwEbHaFgg45yY");
+
+  stripe.charges.create({
+    amount: cart.totalPrice * 100,
+    currency: "usd",
+    source: req.body.stripeToken, // obtained with Stripe.js
+    description: "Charge for video game on afta.com"
+  }, function(err, charge) {
+    // asynchronously called
+    if (err) {
+      req.flash("error", err.message)
+      return res.redirect("/checkout")
+    }
+    req.flash("success", "Your purchase was successful");
+    req.session.cart = null;
+    res.redirect("/")
+  });
+
+
+
+
 }) 
 
 module.exports = router;
