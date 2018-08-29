@@ -7,12 +7,25 @@ let csrfProtection = csrf();
 //use csrfProtection MW for all roues
 router.use(csrfProtection);
 
-
+let Order = require("../models/order");
+let Cart = require("../models/cart"); // Cart constructor
 //ROUTES
 
 //PROFILE route
 router.get("/profile", isLoggedIn, function(req, res) {
-  res.render("user/profile");
+  //list all the orders of the user // req.user is from passport
+  Order.find({user: req.user}, function(err, orders) {
+    if (err) {
+      console.log('err', err);
+      res.write("Error")
+    }
+    let cart;
+    orders.forEach(order=>{
+      cart = new Cart(order.cart); // on each itern create inst of Cart constrr
+      order.items = cart.generateArray();
+    });
+    res.render("user/profile", {orders: orders});
+  }) 
 });
 //LOGOUT route
 router.get("/logout", isLoggedIn, (req, res)=>{
