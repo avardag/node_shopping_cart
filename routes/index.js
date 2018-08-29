@@ -3,6 +3,7 @@ let router = express.Router();
 
 let Product = require("../models/product");
 let Cart = require("../models/cart");
+let Order = require("../models/order");
 
 //ROUTES
 /* GET home page. */
@@ -88,9 +89,24 @@ router.post("/checkout", (req, res, next)=>{
       req.flash("error", err.message)
       return res.redirect("/checkout")
     }
-    req.flash("success", "Your purchase was successful");
-    req.session.cart = null;
-    res.redirect("/")
+    //create a new order & save to DB
+    let order = new Order({
+      user: req.user,  // passport passes user to req
+      cart: cart, //cart instance -> let cart = new Cart(req.session.cart);
+      address: req.body.address, // from the form within body of get route
+      name: req.body.name,
+      paymentId: charge.id // from stripe
+    })
+    order.save((err, result)=>{
+      if (err) {
+        console.log('err', err);
+      }
+      req.flash("success", "Your purchase was successful");
+      req.session.cart = null;
+      res.redirect("/")
+    });
+
+    
   });
 
 
