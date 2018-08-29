@@ -60,7 +60,7 @@ router.get("/shopping-cart", (req, res, next)=>{
 })
 
 //checkout route
-router.get("/checkout", (req, res, next)=>{
+router.get("/checkout", isLoggedIn, (req, res, next)=>{
   if (!req.session.cart) {
     return res.redirect("/shopping-cart")
   }
@@ -70,7 +70,7 @@ router.get("/checkout", (req, res, next)=>{
   res.render("shop/checkout", { total: cart.totalPrice, errMsg: errMsg, noError: !errMsg})
 }) 
 //checkout post - charge
-router.post("/checkout", (req, res, next)=>{
+router.post("/checkout", isLoggedIn, (req, res, next)=>{
   if (!req.session.cart) {
     return res.redirect("/shopping-cart")
   }
@@ -105,13 +105,19 @@ router.post("/checkout", (req, res, next)=>{
       req.session.cart = null;
       res.redirect("/")
     });
-
-    
   });
-
-
-
-
 }) 
 
 module.exports = router;
+
+
+//middleware
+function isLoggedIn(req, res, next) {
+  if (req.isAuthenticated()) { //isAuthenticated -> method from passport
+    return next();
+  }
+  //redirect to  url( e.x. checkout), where user intended to go before
+  //store the old url to session var:
+  req.session.oldUrl = req.url // pass it to user/signin route
+  res.redirect("/user/signin");
+}
