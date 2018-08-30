@@ -49,6 +49,26 @@ router.get("/add-to-cart/:id", (req, res, next)=>{
     res.redirect("/")
   })
 })
+//reduce by one route
+router.get("/reduce/:id", (req, res, next)=>{
+  let productId = req.params.id;
+  //create new Cart instance,  if it exists pass old cart from session
+  let cart = new Cart(req.session.cart ? req.session.cart : {});
+
+  cart.reduceByOne(productId);
+  req.session.cart = cart;
+  res.redirect("/shopping-cart");
+})
+//remove Items route
+router.get("/remove/:id", (req, res, next)=>{
+  let productId = req.params.id;
+  //create new Cart instance,  if it exists pass old cart from session
+  let cart = new Cart(req.session.cart ? req.session.cart : {});
+
+  cart.removeItem(productId);
+  req.session.cart = cart;
+  res.redirect("/shopping-cart");
+})
 //Shopping cart route
 router.get("/shopping-cart", (req, res, next)=>{
   if (!req.session.cart) {
